@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io"
 )
 
 // Event represents a Server-Sent Event
@@ -16,9 +17,25 @@ type Event struct {
 	Data map[string]interface{}
 }
 
+//Client is the default client used for requests.
+var Client = &http.Client{}
+
+func liveReq(verb, uri string, body io.Reader) (*http.Request, error) {
+        req, err := http.NewRequest(verb, uri, body)
+        if err != nil {
+                return nil, err
+        }
+
+        req.Header.Set("Accept", "text/event-stream")
+
+        return req, nil
+}
+
 // OpenURL opens a connection to a stream of server sent events
 func OpenURL(rawurl string) (chan Event, error) {
-	resp, err := get(rawurl)
+        //resp, err := get(rawurl)
+        req, err := liveReq("GET", rawurl, nil)
+        res, err := Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
