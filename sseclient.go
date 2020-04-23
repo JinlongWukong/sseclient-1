@@ -41,7 +41,7 @@ func OpenURL(rawurl string) (chan Event, error) {
 	}
 
 	events := make(chan Event)
-	reader := bufio.NewReader(resp.Body)
+	reader := bufio.NewReader(res.Body)
 
 	go loop(reader, events)
 
